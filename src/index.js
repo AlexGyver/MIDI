@@ -65,7 +65,9 @@ function process(midi) {
 
 function makeText() {
     let h = `#pragma once
-#include <GyverMIDI.h>
+#include "GyverMIDI.h"
+
+// Сделано в конвертере https://alexgyver.github.io/MIDI
 `;
     tracks.forEach((track, i) => {
         if (!ui['channel_' + i]) return;
