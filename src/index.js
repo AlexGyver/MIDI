@@ -38,12 +38,15 @@ function process(midi) {
                     });
                 }
 
-                let freq = (440 * Math.pow(2, (note.midi - 69) / 12));
                 let duration = Math.round(note.durationTicks * dur);
                 let delay = Math.round((track.notes[i + 1] ? (track.notes[i + 1].ticks - note.ticks) : note.durationTicks) * dur);
 
+                let freq = 440 * Math.pow(2, (note.midi - 69) / 12);
+                freq = Math.round(1000000 / freq);
+                if (track.channel == 9 || track.channel == 10) freq = note.midi;    // percussion
+
                 notes.push({
-                    us: Math.round(1000000 / freq),
+                    us: freq,
                     duration: duration,
                     delay: delay,
                 });
@@ -59,8 +62,6 @@ function process(midi) {
         ui.addSwitch('channel_' + i, `${track.name} [${track.notes.length}]`, true, makeText);
     });
     makeText();
-    console.log(midi.tracks);
-
 }
 
 function makeText() {
