@@ -26,6 +26,7 @@ function process(midi) {
     let dur = 60000 / (BPM * midi.header.ppq);
 
     tracks = [];
+    let name_i = 0;
     midi.tracks.forEach(track => {
         if (track.notes.length) {
             let notes = [];
@@ -43,7 +44,7 @@ function process(midi) {
 
                 let freq = 440 * Math.pow(2, (note.midi - 69) / 12);
                 freq = Math.round(1000000 / freq);
-                if (track.channel == 9 || track.channel == 10) freq = note.midi;    // percussion
+                if (track.channel == 9 || track.channel == 10) freq = note.midi;
 
                 notes.push({
                     us: freq,
@@ -52,9 +53,12 @@ function process(midi) {
                 });
             });
 
+            let name = track.name.length ? track.name : ('Unnamed ' + name_i++);
+            if (track.channel == 9 || track.channel == 10) name += ' [drums]';
+
             tracks.push({
-                name: track.name.length ? track.name : 'Unnamed',
-                notes: notes
+                name: name,
+                notes: notes,
             });
         }
     });
@@ -68,13 +72,13 @@ function makeText() {
     let h = `#pragma once
 #include "GyverMIDI.h"
 
-// Сделано в конвертере https://alexgyver.github.io/MIDI
+// MIDI Converter: https://alexgyver.github.io/MIDI
 `;
     tracks.forEach((track, i) => {
         if (!ui['channel_' + i]) return;
         h += `
 // ${track.name}
-static const GyverMIDI::Note track_${i}[] PROGMEM = {
+static const GyverMIDI::Note ${ui.name}_${i}[] PROGMEM = {
 `;
         track.notes.forEach(note => {
             h += `\t{${note.us}, ${note.duration}, ${note.delay}},\r\n`;
@@ -97,6 +101,20 @@ function download_h() {
     link.download = 'midi.h';
     link.click();
 }
+function download_bin() {
+    tracks.forEach((track, i) => {
+        if (!ui['channel_' + i]) return;
+        let data = [];
+        data.push(track.notes.length);
+        track.notes.forEach((note) => data.push(note.us, note.duration, note.delay));
+        let bytes = Uint16Array.from(data);
+        let blob = new Blob([bytes], { type: "application/octet-stream" });
+        let link = document.createElement('a');
+        link.href = window.URL.createObjectURL(blob);
+        link.download = track.name + '.notes';
+        link.click();
+    });
+}
 
 document.addEventListener("DOMContentLoaded", () => {
     if ('serviceWorker' in navigator && typeof USE_SW !== 'undefined') {
@@ -105,6 +123,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ui = new UI({ title: "MIDI Converter", theme: 'light', width: 300 })
         .addFile('file', 'File', file_h)
         .addText('link', 'Link', '', link_h)
+        .addText('name', 'Name', 'midi', makeText)
         .addArea('code', 'Code', '', null, 15)
-        .addButtons({ 'copy': ['Copy', copy], 'h': ['.h', download_h] });
+        .addButtons({ 'copy': ['Copy', copy], 'h': ['.h', download_h], 'bins': ['bins', download_bin] });
 });
