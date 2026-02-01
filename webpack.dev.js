@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require("webpack");
 const PACKAGE = require('./package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
@@ -22,6 +23,10 @@ module.exports = {
                     MiniCssExtractPlugin.loader,
                     "css-loader"
                 ]
+            },
+            {
+                test: /favicon\.svg$/,
+                type: 'asset/resource',
             }
         ]
     },
@@ -38,6 +43,9 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'style.css',
         }),
+        new webpack.DefinePlugin({
+            APP_VER: JSON.stringify(PACKAGE.version),
+        }),
     ],
 
     devServer: {
@@ -49,7 +57,6 @@ module.exports = {
 
     watchOptions: {
         poll: 1000,
-        // ignored: '/node_modules/',
     },
 
     mode: 'development',

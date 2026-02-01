@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require("webpack");
 const PACKAGE = require('./package.json');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const TerserPlugin = require("terser-webpack-plugin");
@@ -35,24 +36,30 @@ module.exports = {
                     MiniCssExtractPlugin.loader,
                     "css-loader"
                 ]
-            }
+            },
+            {
+                test: /favicon.svg$/,
+                type: 'asset/inline',
+            },
         ]
     },
 
     plugins: [
         new HtmlWebpackPlugin({
             template: `./src/index.html`,
-            filename: PACKAGE.single_name,
             inject: true,
-            minify: false,
+            filename: PACKAGE.name + '.html',
             version: PACKAGE.version,
             title: PACKAGE.title,
         }),
         new HtmlInlineScriptPlugin({
-            htmlMatchPattern: [new RegExp(`${PACKAGE.single_name}$`)],
+            htmlMatchPattern: [new RegExp(`${PACKAGE.name + '.html'}$`)],
         }),
         new MiniCssExtractPlugin({
             filename: 'style.css',
+        }),
+        new webpack.DefinePlugin({
+            APP_VER: JSON.stringify(PACKAGE.version),
         }),
         new HTMLInlineCSSWebpackPlugin(),
     ],

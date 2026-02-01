@@ -5,14 +5,14 @@
     "start_url": ".",
     "name": "MIDI Converter",
     "short_name": "MIDI Converter",
-    "description": "Converter for Arduino",
+    "description": "MIDI Converter for Arduino",
     "orientation": "portrait",
     "icons": [
         {
-            "src": "favicon.svg",
-            "sizes": "48x48 72x72 96x96 128x128 256x256 512x512",
-            "type": "image/svg+xml",
-            "purpose": "any"
+            "src": "icon.png",
+            "sizes": "512x512",
+            "type": "image/png",
+            "purpose": "any maskable"
         }
     ]
 }

@@ -1,13 +1,12 @@
 const path = require('path');
 const webpack = require("webpack");
 const PACKAGE = require('./package.json');
-
-const ReplaceHashInFileWebpackPlugin = require('replace-hash-in-file-webpack-plugin');
-const HtmlWebpackPlugin = require('html-webpack-plugin');
+const CopyPlugin = require("copy-webpack-plugin");
 const TerserPlugin = require("terser-webpack-plugin");
+const HtmlWebpackPlugin = require('html-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CssMinimizerPlugin = require('css-minimizer-webpack-plugin');
-const CopyPlugin = require("copy-webpack-plugin");
+const ReplaceHashInFileWebpackPlugin = require('replace-hash-in-file-webpack-plugin');
 
 module.exports = {
     entry: {
@@ -38,16 +37,20 @@ module.exports = {
                     "css-loader"
                 ]
             },
+            {
+                test: /favicon\.svg$/,
+                type: 'asset/resource',
+                generator: {
+                    filename: 'favicon.svg'
+                }
+            }
         ]
     },
 
     plugins: [
         new HtmlWebpackPlugin({
             template: `./src/index.html`,
-            filename: `index.html`,
-            favicon: "./src/assets/favicon.svg",
             inject: true,
-            minify: false,
             hash: true,
             version: PACKAGE.version,
             title: PACKAGE.title,
@@ -56,11 +59,15 @@ module.exports = {
         new MiniCssExtractPlugin({
             filename: 'style.css',
         }),
-        new webpack.DefinePlugin({ USE_SW: JSON.stringify(true) }),
+        new webpack.DefinePlugin({
+            APP_VER: JSON.stringify(PACKAGE.version),
+            USE_SW: JSON.stringify(true),
+        }),
         new CopyPlugin({
             patterns: [
                 { from: "src/assets/sw.js", to: "" },
                 { from: "src/assets/manifest.json", to: "" },
+                { from: "src/assets/icon.png", to: "" },
             ],
         }),
         new ReplaceHashInFileWebpackPlugin([
@@ -91,8 +98,8 @@ module.exports = {
                         replace: PACKAGE.title,
                     },
                     {
-                        search: /@descr/,
-                        replace: PACKAGE.descr,
+                        search: /@description/,
+                        replace: PACKAGE.description,
                     },
                 ]
             }
