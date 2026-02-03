@@ -115,7 +115,7 @@ function makeText() {
 
     let h = `#pragma once
 #include <Arduino.h>
-#include "MIDINote.h"
+#include <MIDINote.h>
 
 // Library: https://github.com/GyverLibs/GyverMIDI
 // MIDI Converter: https://alexgyver.github.io/MIDI
@@ -125,7 +125,8 @@ function makeText() {
 static const MIDINote ${ui.name}[] PROGMEM = {
 `;
     notes.forEach(note => h += `\t{${note.note}, ${note.duration8}, ${note.delay}},\r\n`);
-    h += '};\r\n';
+    h += '};\r\n\r\n';
+    h += `static const size_t ${ui.name}_size = sizeof(${ui.name});`;
     ui.code = h;
 }
 

@@ -3,9 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title><%= htmlWebpackPlugin.options.title %> v<%= htmlWebpackPlugin.options.version %></title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1">
+  <link rel="icon" href="<%= require('./assets/favicon.svg') %>" type="image/svg+xml">
   <%= htmlWebpackPlugin.options.manifest %>
+  <title><%= htmlWebpackPlugin.options.title %> v<%= htmlWebpackPlugin.options.version %></title>
 </head>
 
 <body></body>
